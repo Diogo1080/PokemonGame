@@ -1,4 +1,4 @@
-package Game.Ententies.NPCs.Events;
+package Game.Ententies.Events;
 
 import java.util.List;
 

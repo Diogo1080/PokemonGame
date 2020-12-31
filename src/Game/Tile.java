@@ -13,7 +13,7 @@ public enum Tile {
     COLLUM((char) 35, AsciiPanel.brightBlack,false),
     BUILDINGWALLTALL((char) 124, AsciiPanel.brightBlack,false),
     BUILDINGWALLWIDE((char) 45, AsciiPanel.brightBlack,false),
-    REWARDPOKEBALL('º', AsciiPanel.red,false),
+    REWARDPOKEBALL('0', AsciiPanel.red,false),
     BOUNDS('X', AsciiPanel.black,false);
 
     private char glyph;

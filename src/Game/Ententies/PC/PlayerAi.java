@@ -3,6 +3,7 @@ package Game.Ententies.PC;
 import Game.Ententies.EntitiesAi;
 import Game.Ententies.Entity;
 import Game.Ententies.NPCs.Npc;
+import Game.Ententies.Teleporters.Teleporter;
 import Game.Tile;
 
 import java.util.LinkedList;
@@ -18,16 +19,13 @@ public class PlayerAi extends EntitiesAi {
         messages.add(message);
     }
 
-    public PlayerAi(Entity ententie) {
-        super(ententie);
+    public PlayerAi(Entity entity) {
+        super(entity);
         messages=new LinkedList<>();
     }
 
     @Override
-    public void onEnterNewTile(int x, int y, Tile tile, Npc entityByCords) {
-        if (entityByCords != null){
-            return;
-        }
+    public void onEnterNewTile(int x, int y, Tile tile, Entity entityByCords) {
         if (tile.isWalkable()) {
             entity.x = x;
             entity.y = y;

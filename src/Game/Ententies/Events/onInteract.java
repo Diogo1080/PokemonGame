@@ -1,4 +1,4 @@
-package Game.Ententies.NPCs.Events;
+package Game.Ententies.Events;
 
 import Game.Ententies.NPCs.Npc;
 import Game.Ententies.NPCs.NpcKinds.People;

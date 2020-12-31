@@ -1,19 +1,20 @@
 package Game.Screens;
 
+import Game.Constants;
 import Game.Ententies.EntitiesFactory;
 import Game.Ententies.Entity;
-import Game.Ententies.NPCs.Events.Event;
-import Game.Ententies.NPCs.Events.onInteract;
+import Game.Ententies.Events.Event;
+import Game.Ententies.Events.onInteract;
 import Game.Ententies.NPCs.Npc;
 import Game.Ententies.PC.Player;
 import Game.Ententies.PC.PlayerAi;
-import Game.World.GameLoader;
-import Game.World.Map;
+import Game.Ententies.Teleporters.Teleporter;
+import Game.GameLoader;
+import Game.GameSaver;
+import Game.Map;
 import asciiPanel.AsciiPanel;
 
 import java.awt.event.KeyEvent;
-import java.util.LinkedList;
-import java.util.List;
 
 public class PlayScreen implements Screen {
     private Map map;
@@ -21,28 +22,46 @@ public class PlayScreen implements Screen {
     private PlayerAi playerAi;
     private int screenWidth;
     private int screenHeight;
+    private boolean showMenu;
 
-    public PlayScreen() {
-        screenWidth = 24;
+    public PlayScreen(String playerName) {
+        screenWidth = 40;
         screenHeight = 24;
-        LoadMap("./src/Game/World/StarterTown/Places/StartHouse");
+        GameSaver.saveGame(playerName);
+        String path = Constants.PATHTOINITGAME.formatted(playerName);
+        LoadMap(path);
         EntitiesFactory entitiesFactory = new EntitiesFactory(map);
-        LoadEntities(entitiesFactory);
-        player = entitiesFactory.newPlayer("Player");
+        LoadEntities(entitiesFactory, path);
+        player = entitiesFactory.newPlayer(playerName);
+        playerAi = (PlayerAi) player.getAi();
+        GameSaver.savePlayer((Player) player, Constants.BASESAVEPATH.concat("/").concat(playerName));
+    }
+
+    public PlayScreen(String playerName, String filename) {
+        screenWidth = 40;
+        screenHeight = 24;
+        LoadPlayer(filename + "/Player.Json");
+        LoadMap(player.map.getPath());
+        EntitiesFactory entitiesFactory = new EntitiesFactory(map);
+        LoadEntities(entitiesFactory, player.map.getPath());
+    }
+
+    private void LoadPlayer(String filename) {
+        player = GameLoader.LoadPlayer(filename);
         playerAi = (PlayerAi) player.getAi();
     }
 
     private void LoadMap(String Filename) {
-        map = new GameLoader().LoadMap(Filename).build();
+        map = GameLoader.LoadMap(Filename);
     }
 
-    private void LoadEntities(EntitiesFactory entitiesFactory){
-        GameLoader.LoadEntities("./src/Game/World/StarterTown/Places/StartHouse", entitiesFactory, map);
+    private void LoadEntities(EntitiesFactory entitiesFactory, String filename) {
+        GameLoader.LoadEntities(filename, entitiesFactory, map);
     }
 
     private void displayTiles(AsciiPanel terminal, int left, int top) {
-        for (int x = 0; x < map.width(); x++) {
-            for (int y = 0; y < map.height(); y++) {
+        for (int x = 0; x < screenWidth - 10; x++) {
+            for (int y = 0; y < screenHeight - 1; y++) {
                 int wx = x + left;
                 int wy = y + top;
 
@@ -70,6 +89,7 @@ public class PlayScreen implements Screen {
         displayMessages(terminal);
         displayTiles(terminal, left, top);
         terminal.write(player.getGlyph(), player.x - left, player.y - top, player.getColor());
+
     }
 
     private void displayMessages(AsciiPanel terminal) {
@@ -82,52 +102,56 @@ public class PlayScreen implements Screen {
 
     @Override
     public Screen respondToUserInput(KeyEvent key) {
+        Entity entity = null;
+        int mx = 0;
+        int my = 0;
         switch (key.getKeyCode()) {
-            case KeyEvent.VK_W -> player.moveBy(0, -1);
-            case KeyEvent.VK_A -> player.moveBy(-1, 0);
-            case KeyEvent.VK_S -> player.moveBy(0, 1);
-            case KeyEvent.VK_D -> player.moveBy(1, 0);
-            case KeyEvent.VK_E -> {
-                return playerInteraction();
+            case KeyEvent.VK_W -> {
+                entity = map.getEntityByCords(player.x, player.y - 1);
+                my = -1;
+            }
+            case KeyEvent.VK_A -> {
+                entity = map.getEntityByCords(player.x - 1, player.y);
+                mx = -1;
+            }
+            case KeyEvent.VK_S -> {
+                entity = map.getEntityByCords(player.x, player.y + 1);
+                my = 1;
+            }
+            case KeyEvent.VK_D -> {
+                entity = map.getEntityByCords(player.x + 1, player.y);
+                mx = 1;
+            }
+            case KeyEvent.VK_ENTER -> {
+                showMenu = true;
             }
         }
-        return this;
-    }
-
-
-    public Screen playerInteraction() {
-        List<Npc> entitiesAroundPlayer = new LinkedList<>();
-        getEntitiesAroundPlayer(entitiesAroundPlayer);
-
-        if (entitiesAroundPlayer.size() > 1) {
-           return new SelectInteractionScreen(entitiesAroundPlayer,this);
-        } else if (entitiesAroundPlayer.size() > 0) {
-            Npc entity = entitiesAroundPlayer.get(0);
-            for (Event eachEvent : entity.getEvents()) {
-                if (eachEvent.getName().equals("onInteract")) {
-                    onInteract event = (onInteract) eachEvent;
-                    event.interact(entitiesAroundPlayer.get(0), (Player) player, playerAi);
-                    break;
-                }
+        if (entity != null) {
+            if (entity instanceof Npc) {
+                playerInteraction((Npc) entity);
+            }
+            if (entity instanceof Teleporter) {
+                triggerTeleportEvent((Teleporter) entity);
             }
         } else {
-            playerAi.Notify("There is no one around you");
+            player.moveBy(mx, my);
         }
         return this;
     }
 
-    private void getEntitiesAroundPlayer(List<Npc> entitiesAroundPlayer) {
-        if (map.getEntityByCords(player.x + 1, player.y) != null) {
-            entitiesAroundPlayer.add(map.getEntityByCords(player.x + 1, player.y));
-        }
-        if (map.getEntityByCords(player.x, player.y + 1) != null) {
-            entitiesAroundPlayer.add(map.getEntityByCords(player.x, player.y + 1));
-        }
-        if (map.getEntityByCords(player.x - 1, player.y) != null) {
-            entitiesAroundPlayer.add(map.getEntityByCords(player.x - 1, player.y));
-        }
-        if (map.getEntityByCords(player.x, player.y - 1) != null) {
-            entitiesAroundPlayer.add(map.getEntityByCords(player.x, player.y - 1));
+
+    private void triggerTeleportEvent(Teleporter teleporter) {
+        map = teleporter.getEvent().teleport((Player) player, playerAi);
+    }
+
+
+    public void playerInteraction(Npc npc) {
+        for (Event eachEvent : npc.getEvents()) {
+            if (eachEvent.getName().equals("onInteract")) {
+                onInteract event = (onInteract) eachEvent;
+                event.interact(npc, (Player) player, playerAi);
+                break;
+            }
         }
     }
 

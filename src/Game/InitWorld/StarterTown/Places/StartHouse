@@ -1,5 +1,5 @@
 {
-  "name": "Starter House",
+  "name": "StartHouse",
   "width": 10,
   "height": 9,
   "entities": [
@@ -19,10 +19,12 @@
           "repeat": true
         },
         {
-          "name": "onPlayerPositions",
-          "position": [
+          "name": "onPlayerPosition",
+          "range": false,
+          "positionsToLook": [
             {
-              "X": 7, "Y": 5
+              "X": 7,
+              "Y": 5
             }
           ],
           "talks": [
@@ -36,35 +38,22 @@
       ]
     },
     {
-      "type": "People",
-      "name": "Mom",
-      "X": 1,
-      "Y": 4,
+      "type": "Teleporter",
+      "name": "StartHouseExit",
+      "X": 3,
+      "Y": 8,
       "Events": [
         {
-          "name": "onInteract",
-          "talks": [
-            "I wish your father had more time to be with us.",
-            "Your father is always so busy around the gym of his.",
-            "Ho, well back to staring at the ascii wall."
+          "name": "onTeleport",
+          "mapToTeleport": "StarterTown/StarterTown",
+          "talks":[
+            "You get out of your house"
           ],
+          "positionToTeleport": {
+            "X": 5,
+            "Y": 7
+          },
           "repeat": true
-        },
-        {
-          "name": "onPlayerPositions",
-          "Positions": [
-            {
-              "X": 7,
-              "Y": 5
-            }
-          ],
-          "talks": [
-            "Hi %s , i wanted to tell you the professor wanted to talk to you, go to his lab...",
-            "If you don't remember where it is, it's right down from the house, take care."
-          ],
-          "moveToPlayer": true,
-          "repeat": false,
-          "done": false
         }
       ]
     }

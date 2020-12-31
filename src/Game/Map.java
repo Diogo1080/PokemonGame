@@ -1,8 +1,6 @@
-package Game.World;
+package Game;
 
 import Game.Ententies.Entity;
-import Game.Ententies.NPCs.Npc;
-import Game.Tile;
 
 import java.awt.*;
 import java.util.LinkedList;
@@ -10,6 +8,17 @@ import java.util.List;
 
 public class Map {
     private List<Entity> entityList;
+    private String name;
+    private String path;
+
+    public String getPath() {
+        return path;
+    }
+
+    public String getName() {
+        return name;
+    }
+
 
     public List<Entity> getEntityList() {
         return entityList;
@@ -28,8 +37,10 @@ public class Map {
         return height;
     }
 
-    public Map(Tile[][] tiles) {
+    public Map(Tile[][] tiles, String name, String path) {
         this.entityList = new LinkedList<>();
+        this.name = name;
+        this.path = path;
         this.tiles = tiles;
         this.width = tiles.length;
         this.height = tiles[0].length;
@@ -55,10 +66,10 @@ public class Map {
         entity.y = y;
     }
 
-    public Npc getEntityByCords(int x, int y) {
-        for (Entity entity :entityList) {
-            if (entity.x == x && entity.y == y){
-                return (Npc) entity;
+    public Entity getEntityByCords(int x, int y) {
+        for (Entity entity : entityList) {
+            if (entity.x == x && entity.y == y) {
+                return entity;
             }
         }
         return null;

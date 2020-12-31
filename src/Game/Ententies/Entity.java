@@ -1,11 +1,11 @@
 package Game.Ententies;
 
-import Game.World.Map;
+import Game.Map;
 
 import java.awt.*;
 
 public abstract class Entity {
-    private Map map;
+    public Map map;
     public int x;
     public int y;
 

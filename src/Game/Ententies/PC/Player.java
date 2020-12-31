@@ -1,7 +1,7 @@
 package Game.Ententies.PC;
 
 import Game.Ententies.Entity;
-import Game.World.Map;
+import Game.Map;
 
 import java.awt.*;
 

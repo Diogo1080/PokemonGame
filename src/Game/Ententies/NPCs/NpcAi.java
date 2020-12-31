@@ -10,8 +10,6 @@ public class NpcAi extends EntitiesAi {
     }
 
     @Override
-    public void onEnterNewTile(int x, int y, Tile tile, Npc entityByCords) {
-
-    }
+    public void onEnterNewTile(int x, int y, Tile tile, Entity entityByCords) { }
 
 }

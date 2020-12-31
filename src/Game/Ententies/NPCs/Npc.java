@@ -1,8 +1,8 @@
 package Game.Ententies.NPCs;
 
 import Game.Ententies.Entity;
-import Game.Ententies.NPCs.Events.Event;
-import Game.World.Map;
+import Game.Ententies.Events.Event;
+import Game.Map;
 
 import java.awt.*;
 import java.util.List;

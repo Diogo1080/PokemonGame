@@ -11,6 +11,6 @@ public abstract class EntitiesAi {
         this.entity.setAi(this);
     }
 
-    public abstract void onEnterNewTile(int x, int y, Tile tile, Npc entityByCords);
+    public abstract void onEnterNewTile(int x, int y, Tile tile, Entity entityByCords);
 }
 
