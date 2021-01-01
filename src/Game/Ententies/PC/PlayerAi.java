@@ -2,8 +2,7 @@ package Game.Ententies.PC;
 
 import Game.Ententies.EntitiesAi;
 import Game.Ententies.Entity;
-import Game.Ententies.NPCs.Npc;
-import Game.Ententies.Teleporters.Teleporter;
+import Game.Ententies.Events.Event;
 import Game.Tile;
 
 import java.util.LinkedList;
@@ -19,7 +18,7 @@ public class PlayerAi extends EntitiesAi {
         messages.add(message);
     }
 
-    public PlayerAi(Entity entity) {
+    public PlayerAi(Player entity) {
         super(entity);
         messages=new LinkedList<>();
     }
@@ -30,6 +29,11 @@ public class PlayerAi extends EntitiesAi {
             entity.x = x;
             entity.y = y;
         }
+    }
+
+    @Override
+    public Event onUpdate() {
+        return null;
     }
 
 }

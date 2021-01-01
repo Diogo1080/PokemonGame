@@ -1,5 +1,6 @@
 package Game.Ententies;
 
+import Game.Ententies.Events.Event;
 import Game.Map;
 
 import java.awt.*;
@@ -34,5 +35,13 @@ public abstract class Entity {
         this.glyph = glyph;
         this.color = color;
     }
+
+    public boolean canEnterTile(int x, int y) {
+            return map.tile(x, y).isWalkable() && map.getEntityByCords(x, y) == null;
+    }
+
+    public Event update(){
+        return ai.onUpdate();
+    };
 }
 

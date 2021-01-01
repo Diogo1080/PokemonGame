@@ -5,8 +5,9 @@ import Game.Ententies.Entity;
 import Game.Ententies.Events.Event;
 import Game.Ententies.Events.onInteract;
 import Game.Ententies.Events.onTeleport;
+import Game.Ententies.NPCs.Npc;
 import Game.Ententies.NPCs.NpcKinds.People;
-import Game.Ententies.Teleporters.Teleporter;
+import Game.Ententies.NPCs.NpcKinds.Teleporter;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -57,7 +58,7 @@ public class GameLoader {
         return null;
     }
 
-    private static List<Event> loadEventsFromEntity(JSONArray entityEvents) {
+    private static List<Event> loadEventsFromEntity(JSONArray entityEvents, Npc npc) {
         List<Event> eventsReturned = new LinkedList<>();
 
         for (Object event : entityEvents) {
@@ -71,7 +72,7 @@ public class GameLoader {
             }
 
             if ("onInteract".equals(eventInfo.get("name"))) {
-                eventsReturned.add(new onInteract((String) eventInfo.get("name"), talks, (Boolean) eventInfo.get("repeat")));
+                eventsReturned.add(new onInteract((String) eventInfo.get("name"), talks, (Boolean) eventInfo.get("repeat"), npc));
             }
             if ("onTeleport".equals(eventInfo.get("name"))) {
                 JSONObject positionToTeleport = (JSONObject) eventInfo.get("positionToTeleport");
@@ -79,7 +80,7 @@ public class GameLoader {
                 int y = Math.toIntExact((Long) positionToTeleport.get("Y"));
                 int x = Math.toIntExact((Long) positionToTeleport.get("X"));
 
-                eventsReturned.add(new onTeleport((String) eventInfo.get("name"), talks, (Boolean) eventInfo.get("repeat"), (String) eventInfo.get("mapToTeleport"), x, y));
+                eventsReturned.add(new onTeleport((String) eventInfo.get("name"), talks, (Boolean) eventInfo.get("repeat"), (String) eventInfo.get("mapToTeleport"), x, y, npc));
             }
             /*if ("onPlayerPosition".equals(eventInfo.get("name"))) {
                 List<Integer> y = new LinkedList<>(), x = new LinkedList<>();
@@ -110,18 +111,19 @@ public class GameLoader {
                     People person = (People) entitiesFactory.newPeople(
                             (String) entityInfo.get("name"),
                             Math.toIntExact((Long) entityInfo.get("X")),
-                            Math.toIntExact((Long) entityInfo.get("Y")),
-                            loadEventsFromEntity((JSONArray) entityInfo.get("Events"))
+                            Math.toIntExact((Long) entityInfo.get("Y"))
                     );
+                    person.setEvents(loadEventsFromEntity((JSONArray) entityInfo.get("Events"), person));
+
                     map.getEntityList().add(person);
                 }
                 if ("Teleporter".equals(entityInfo.get("type"))) {
                     Teleporter teleporter = (Teleporter) entitiesFactory.newTeleporter(
                             (String) entityInfo.get("name"),
                             Math.toIntExact((Long) entityInfo.get("X")),
-                            Math.toIntExact((Long) entityInfo.get("Y")),
-                            loadEventsFromEntity((JSONArray) entityInfo.get("Events"))
+                            Math.toIntExact((Long) entityInfo.get("Y"))
                     );
+                    teleporter.setEvents(loadEventsFromEntity((JSONArray) entityInfo.get("Events"), teleporter));
                     map.getEntityList().add(teleporter);
                 }
             }

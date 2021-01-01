@@ -8,7 +8,7 @@ import Game.Ententies.Events.onInteract;
 import Game.Ententies.NPCs.Npc;
 import Game.Ententies.PC.Player;
 import Game.Ententies.PC.PlayerAi;
-import Game.Ententies.Teleporters.Teleporter;
+import Game.Ententies.NPCs.NpcKinds.Teleporter;
 import Game.GameLoader;
 import Game.GameSaver;
 import Game.Map;
@@ -23,6 +23,7 @@ public class PlayScreen implements Screen {
     private int screenWidth;
     private int screenHeight;
     private boolean showMenu;
+    private Event handleEvent = null;
 
     public PlayScreen(String playerName) {
         screenWidth = 40;
@@ -89,7 +90,6 @@ public class PlayScreen implements Screen {
         displayMessages(terminal);
         displayTiles(terminal, left, top);
         terminal.write(player.getGlyph(), player.x - left, player.y - top, player.getColor());
-
     }
 
     private void displayMessages(AsciiPanel terminal) {
@@ -122,9 +122,7 @@ public class PlayScreen implements Screen {
                 entity = map.getEntityByCords(player.x + 1, player.y);
                 mx = 1;
             }
-            case KeyEvent.VK_ENTER -> {
-                showMenu = true;
-            }
+            case KeyEvent.VK_ENTER -> showMenu = true;
         }
         if (entity != null) {
             if (entity instanceof Npc) {
@@ -136,6 +134,12 @@ public class PlayScreen implements Screen {
         } else {
             player.moveBy(mx, my);
         }
+        if (handleEvent != null) {
+            handleEvent.handle(player,playerAi);
+        } else {
+            handleEvent = map.update();
+        }
+
         return this;
     }
 
@@ -149,7 +153,7 @@ public class PlayScreen implements Screen {
         for (Event eachEvent : npc.getEvents()) {
             if (eachEvent.getName().equals("onInteract")) {
                 onInteract event = (onInteract) eachEvent;
-                event.interact(npc, (Player) player, playerAi);
+                event.handle(player, playerAi);
                 break;
             }
         }

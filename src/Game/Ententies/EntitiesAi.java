@@ -1,6 +1,6 @@
 package Game.Ententies;
 
-import Game.Ententies.NPCs.Npc;
+import Game.Ententies.Events.Event;
 import Game.Tile;
 
 public abstract class EntitiesAi {
@@ -12,5 +12,7 @@ public abstract class EntitiesAi {
     }
 
     public abstract void onEnterNewTile(int x, int y, Tile tile, Entity entityByCords);
+
+    public abstract Event onUpdate();
 }
 

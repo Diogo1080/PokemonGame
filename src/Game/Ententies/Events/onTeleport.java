@@ -2,6 +2,8 @@ package Game.Ententies.Events;
 
 import Game.Constants;
 import Game.Ententies.EntitiesFactory;
+import Game.Ententies.Entity;
+import Game.Ententies.NPCs.Npc;
 import Game.Ententies.PC.Player;
 import Game.Ententies.PC.PlayerAi;
 import Game.GameLoader;
@@ -13,8 +15,8 @@ public class onTeleport extends Event {
     String mapToTeleport;
     int y, x;
 
-    public onTeleport(String name, List<String> talks, boolean repeat, String mapToTeleport, int x, int y) {
-        super(name, talks, repeat);
+    public onTeleport(String name, List<String> talks, boolean repeat, String mapToTeleport, int x, int y, Npc npc) {
+        super(name, talks, repeat, npc);
         this.mapToTeleport = mapToTeleport;
         this.y = y;
         this.x = x;
@@ -34,5 +36,11 @@ public class onTeleport extends Event {
         player.x = x;
         player.y = y;
         return map;
+    }
+
+
+    @Override
+    public void handle(Entity player, PlayerAi playerAi) {
+
     }
 }

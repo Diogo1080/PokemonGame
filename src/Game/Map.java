@@ -1,8 +1,10 @@
 package Game;
 
 import Game.Ententies.Entity;
+import Game.Ententies.Events.Event;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -71,6 +73,14 @@ public class Map {
             if (entity.x == x && entity.y == y) {
                 return entity;
             }
+        }
+        return null;
+    }
+
+    public Event update(){
+        List<Entity> toUpdate = new ArrayList<Entity>(entityList);
+        for (Entity entity : toUpdate){
+            return entity.update();
         }
         return null;
     }

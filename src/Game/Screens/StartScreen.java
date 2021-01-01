@@ -105,7 +105,13 @@ public class StartScreen implements Screen {
             if (deleteSave) {
                 switch (key.getKeyCode()) {
                     case KeyEvent.VK_N -> deleteSave=false;
-                    case KeyEvent.VK_Y -> GameSaveDeleter.doIt(listOfSaves.get(selectedSave));
+                    case KeyEvent.VK_Y ->{
+                        GameSaveDeleter.doIt(listOfSaves.get(selectedSave));
+                        deleteSave=false;
+                        if (listOfSaves.isEmpty()){
+                            chooseSave=false;
+                        }
+                    }
                 }
             } else {
                 switch (key.getKeyCode()) {

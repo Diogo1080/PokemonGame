@@ -8,7 +8,7 @@ import java.awt.*;
 import java.util.List;
 
 public class People extends Npc {
-    public People(Map map, char glyph, Color color, int x, int y, String name, List<Event> events) {
-        super(map, glyph, color, x, y, name, events);
+    public People(Map map, char glyph, Color color, int x, int y, String name) {
+        super(map, glyph, color, x, y, name);
     }
 }

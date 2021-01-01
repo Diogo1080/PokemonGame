@@ -9,7 +9,7 @@ import java.util.List;
 
 public class Trainer extends Npc {
 
-    public Trainer(Map map, char glyph, Color color, int x, int y, String name, List<Event> events) {
-        super(map, glyph, color, x, y, name, events);
+    public Trainer(Map map, char glyph, Color color, int x, int y, String name) {
+        super(map, glyph, color, x, y, name);
     }
 }
