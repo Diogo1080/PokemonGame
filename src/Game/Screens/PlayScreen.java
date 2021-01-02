@@ -6,9 +6,9 @@ import Game.Ententies.Entity;
 import Game.Ententies.Events.Event;
 import Game.Ententies.Events.onInteract;
 import Game.Ententies.NPCs.Npc;
+import Game.Ententies.NPCs.NpcKinds.Teleporter;
 import Game.Ententies.PC.Player;
 import Game.Ententies.PC.PlayerAi;
-import Game.Ententies.NPCs.NpcKinds.Teleporter;
 import Game.GameLoader;
 import Game.GameSaver;
 import Game.Map;
@@ -23,7 +23,8 @@ public class PlayScreen implements Screen {
     private int screenWidth;
     private int screenHeight;
     private boolean showMenu;
-    private Event handleEvent = null;
+    private boolean playerHasMessage;
+    public Event handleEvent = null;
 
     public PlayScreen(String playerName) {
         screenWidth = 40;
@@ -35,16 +36,18 @@ public class PlayScreen implements Screen {
         LoadEntities(entitiesFactory, path);
         player = entitiesFactory.newPlayer(playerName);
         playerAi = (PlayerAi) player.getAi();
+        map.getEntityList().add(player);
         GameSaver.savePlayer((Player) player, Constants.BASESAVEPATH.concat("/").concat(playerName));
     }
 
     public PlayScreen(String playerName, String filename) {
         screenWidth = 40;
-        screenHeight = 24;
+        screenHeight = 20;
         LoadPlayer(filename + "/Player.Json");
         LoadMap(player.map.getPath());
         EntitiesFactory entitiesFactory = new EntitiesFactory(map);
         LoadEntities(entitiesFactory, player.map.getPath());
+        map.getEntityList().add(player);
     }
 
     private void LoadPlayer(String filename) {
@@ -82,22 +85,46 @@ public class PlayScreen implements Screen {
         return Math.max(0, Math.min(player.y - screenHeight / 2, map.height() - screenHeight));
     }
 
-    @Override
-    public void displayOutput(AsciiPanel terminal) {
-        int left = getScrollX();
-        int top = getScrollY();
-
-        displayMessages(terminal);
-        displayTiles(terminal, left, top);
-        terminal.write(player.getGlyph(), player.x - left, player.y - top, player.getColor());
-    }
 
     private void displayMessages(AsciiPanel terminal) {
         int top = screenHeight - playerAi.getMessages().size();
         for (int i = 0; i < playerAi.getMessages().size(); i++) {
             terminal.writeCenter(playerAi.getMessages().get(i), top + i);
         }
+        if (!playerAi.getMessages().isEmpty()) {
+            playerHasMessage = true;
+        }
         playerAi.getMessages().clear();
+    }
+
+    @Override
+    public void displayOutput(AsciiPanel terminal) {
+        if (playerHasMessage) {
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        if (playerAi.getMessages().isEmpty()) {
+            playerHasMessage = false;
+        }
+        terminal.clear();
+        int left = getScrollX();
+        int top = getScrollY();
+        displayMessages(terminal);
+        displayTiles(terminal, left, top);
+        terminal.write(player.getGlyph(), player.x - left, player.y - top, player.getColor());
+        if (handleEvent != null) {
+            handleEvent.handle((Player) player, playerAi);
+            if (handleEvent.getDone()) {
+                if (handleEvent.getRepeat()){
+                    handleEvent.setDone(false);
+                }
+                handleEvent = null;
+            }
+        }
+
     }
 
     @Override
@@ -105,41 +132,40 @@ public class PlayScreen implements Screen {
         Entity entity = null;
         int mx = 0;
         int my = 0;
-        switch (key.getKeyCode()) {
-            case KeyEvent.VK_W -> {
-                entity = map.getEntityByCords(player.x, player.y - 1);
-                my = -1;
+        if (handleEvent == null && !playerHasMessage) {
+            switch (key.getKeyCode()) {
+                case KeyEvent.VK_W -> {
+                    entity = map.getEntityByCords(player.x, player.y - 1);
+                    my = -1;
+                }
+                case KeyEvent.VK_A -> {
+                    entity = map.getEntityByCords(player.x - 1, player.y);
+                    mx = -1;
+                }
+                case KeyEvent.VK_S -> {
+                    entity = map.getEntityByCords(player.x, player.y + 1);
+                    my = 1;
+                }
+                case KeyEvent.VK_D -> {
+                    entity = map.getEntityByCords(player.x + 1, player.y);
+                    mx = 1;
+                }
+                case KeyEvent.VK_ENTER -> showMenu = true;
             }
-            case KeyEvent.VK_A -> {
-                entity = map.getEntityByCords(player.x - 1, player.y);
-                mx = -1;
+            if (entity != null) {
+                if (entity instanceof Npc) {
+                    playerInteraction((Npc) entity);
+                }
+                if (entity instanceof Teleporter) {
+                    triggerTeleportEvent((Teleporter) entity);
+                }
+            } else {
+                player.moveBy(mx, my);
             }
-            case KeyEvent.VK_S -> {
-                entity = map.getEntityByCords(player.x, player.y + 1);
-                my = 1;
-            }
-            case KeyEvent.VK_D -> {
-                entity = map.getEntityByCords(player.x + 1, player.y);
-                mx = 1;
-            }
-            case KeyEvent.VK_ENTER -> showMenu = true;
         }
-        if (entity != null) {
-            if (entity instanceof Npc) {
-                playerInteraction((Npc) entity);
-            }
-            if (entity instanceof Teleporter) {
-                triggerTeleportEvent((Teleporter) entity);
-            }
-        } else {
-            player.moveBy(mx, my);
-        }
-        if (handleEvent != null) {
-            handleEvent.handle(player,playerAi);
-        } else {
+        if (handleEvent == null) {
             handleEvent = map.update();
         }
-
         return this;
     }
 
@@ -153,7 +179,7 @@ public class PlayScreen implements Screen {
         for (Event eachEvent : npc.getEvents()) {
             if (eachEvent.getName().equals("onInteract")) {
                 onInteract event = (onInteract) eachEvent;
-                event.handle(player, playerAi);
+                event.handle((Player) player, playerAi);
                 break;
             }
         }

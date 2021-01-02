@@ -21,18 +21,26 @@ public class ApplicationMain extends JFrame implements KeyListener {
         pack();
         screen = new StartScreen();
         addKeyListener(this);
-        repaint();
+        Thread constantRepaint = new Thread(() -> {
+            try {
+                while (true) {
+                    Thread.sleep(15);
+                    repaint();
+                }
+            } catch (InterruptedException v) {
+                System.out.println(v);
+            }
+        });
+        constantRepaint.start();
     }
 
     public void repaint(){
-        terminal.clear();
         screen.displayOutput(terminal);
         super.repaint();
     }
 
     public void keyPressed(KeyEvent e) {
         screen = screen.respondToUserInput(e);
-        repaint();
     }
 
     public void keyReleased(KeyEvent e) { }

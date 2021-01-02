@@ -10,29 +10,37 @@
       "Y": 5,
       "Events": [
         {
-          "name": "onInteract",
+          "event": "onInteract",
+          "name": "interaction",
           "talks": [
             "I wish your father had more time to be with us.",
             "Your father is always so busy around the gym of his.",
             "Ho, well back to staring at the ascii wall."
           ],
-          "repeat": true
+          "repeat": true,
+          "done": false
         },
         {
-          "name": "onPlayerPosition",
-          "range": false,
+          "event": "onPlayerPosition",
+          "name": "goToProfessor",
           "positionsToLook": [
             {
-              "X": 7,
-              "Y": 5
+              "X": 6,
+              "Y": 4
             }
           ],
           "talks": [
-            "Hi %s, i wanted to tell you the professor wanted to talk to you, go to his lab...",
-            "If you don't remember where it is, it's right down from the house, take care."
+            "Hi %s, i wanted to tell you that..",
+            "professor wanted to talk to you..",
+            "go to his lab if you don't remember",
+            "where it is, it's right down from the house",
+            "take care."
           ],
+          "playerHasPokemon": false,
+          "movePlayerToNpc": false,
           "moveToPlayer": true,
           "repeat": false,
+          "range": false,
           "done": false
         }
       ]
@@ -44,16 +52,18 @@
       "Y": 8,
       "Events": [
         {
-          "name": "onTeleport",
+          "event": "onTeleport",
+          "name": "outOfInitialHouse",
           "mapToTeleport": "StarterTown/StarterTown",
-          "talks":[
+          "talks": [
             "You get out of your house"
           ],
           "positionToTeleport": {
             "X": 5,
             "Y": 7
           },
-          "repeat": true
+          "repeat": true,
+          "done": false
         }
       ]
     }

@@ -1,13 +1,10 @@
 package Game.Ententies.NPCs.NpcKinds;
 
-import Game.Ententies.Events.Event;
 import Game.Ententies.Events.onTeleport;
 import Game.Ententies.NPCs.Npc;
 import Game.Map;
 
 import java.awt.*;
-import java.util.LinkedList;
-import java.util.List;
 
 public class Teleporter extends Npc {
 

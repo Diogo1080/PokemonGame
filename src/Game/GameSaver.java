@@ -1,9 +1,15 @@
 package Game;
 
+import Game.Ententies.Events.onPlayerPosition;
+import Game.Ententies.NPCs.Npc;
 import Game.Ententies.PC.Player;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -18,7 +24,7 @@ public class GameSaver {
         if (!theDir.exists()) {
             theDir.mkdir();
             System.out.println(theDir.toString());
-            savePlayer(player,theDir.toString());
+            savePlayer(player, theDir.toString());
             try {
                 copyToMapsFolder(Path.of(Constants.BASEINITPATH), Path.of(theDir.toString().concat("/Maps")));
             } catch (IOException e) {
@@ -42,10 +48,10 @@ public class GameSaver {
 
     public static void savePlayer(Player player, String theDir) {
         JSONObject Player = new JSONObject();
-        Player.put("name",player.getName());
-        Player.put("currentMap",player.map.getPath());
-        Player.put("X",player.x);
-        Player.put("Y",player.y);
+        Player.put("name", player.getName());
+        Player.put("currentMap", player.map.getPath());
+        Player.put("X", player.x);
+        Player.put("Y", player.y);
 
         //Add list: JSONArray list = new JSONArray();
 
@@ -75,4 +81,37 @@ public class GameSaver {
         }
     }
 
+    public static void saveOnPlayerPositionEvent(onPlayerPosition onPlayerPosition, Player player, Npc npc, Map map) {
+        try {
+            // read the json file
+            FileReader fileReader = new FileReader(map.getPath());
+            JSONParser jsonParser = new JSONParser();
+            JSONObject jsonObject = (JSONObject) jsonParser.parse(fileReader);
+
+            JSONArray entities = (JSONArray) jsonObject.get("entities");
+            for (Object o : entities) {
+                JSONObject entity = (JSONObject) o;
+                if (npc.getName().equals(entity.get("name"))) {
+                    JSONArray events = (JSONArray) entity.get("Events");
+                    for (Object value : events) {
+                        JSONObject event = (JSONObject) value;
+                        if (onPlayerPosition.getName().equals(event.get("name"))) {
+                            event.remove("done");
+                            event.put("done", onPlayerPosition.getDone());
+                        }
+                    }
+                }
+            }
+            fileReader.close();
+            FileWriter fileWriter = new FileWriter(map.getPath());
+            fileWriter.write(jsonObject.toJSONString());
+            fileWriter.flush();
+
+            fileWriter.close();
+
+            savePlayer(player,Constants.BASESAVEPATH.concat("/").concat(player.getName()).concat("/"));
+        } catch (IOException | ParseException | NullPointerException ex) {
+            ex.printStackTrace();
+        }
+    }
 }

@@ -21,23 +21,26 @@ public class StartScreen implements Screen {
 
     @Override
     public void displayOutput(AsciiPanel terminal) {
+        terminal.clear();
         if (chooseName) {
             terminal.write("Enter to complete, BackSpace to delete, Escape to cancel action.", 8, 0);
             terminal.writeCenter("Enter your name:", 5);
             terminal.writeCenter(choosenName, 7);
-            if (choosenNameExists){
-                terminal.writeCenter(choosenName +" exists already",20);
-                choosenNameExists=false;
+            if (choosenNameExists) {
+                terminal.writeCenter(choosenName + " exists already", 20);
+                choosenNameExists = false;
             }
         } else if (chooseSave) {
             if (deleteSave) {
                 String name = listOfSaves.get(selectedSave);
-                terminal.writeCenter("Are you sure you want to delete " + name + "? (Y/N)",10);
+                terminal.writeCenter("Are you sure you want to delete " + name + "? (Y/N)", 10);
             } else {
                 terminal.write("Enter to select save, BackSpace to delete save, Escape to cancel action.", 2, 0);
                 for (int i = 0; i < listOfSaves.size(); i++) {
                     if (selectedSave == i) {
                         terminal.writeCenter(">" + listOfSaves.get(i), i + 5);
+                    }else{
+                        terminal.writeCenter(listOfSaves.get(i), i + 5);
                     }
                 }
             }
@@ -60,6 +63,7 @@ public class StartScreen implements Screen {
                 }
             }
         }
+
     }
 
     private List<String> getListOfSaves() {
@@ -88,9 +92,9 @@ public class StartScreen implements Screen {
             }
             switch (key.getKeyCode()) {
                 case KeyEvent.VK_ENTER -> {
-                    if (new File(Constants.BASESAVEPATH.concat("/").concat(choosenName)).exists()){
-                        choosenNameExists=true;
-                    }else{
+                    if (new File(Constants.BASESAVEPATH.concat("/").concat(choosenName)).exists()) {
+                        choosenNameExists = true;
+                    } else {
                         return new PlayScreen(choosenName);
                     }
                 }
@@ -104,12 +108,13 @@ public class StartScreen implements Screen {
         } else if (chooseSave) {
             if (deleteSave) {
                 switch (key.getKeyCode()) {
-                    case KeyEvent.VK_N -> deleteSave=false;
-                    case KeyEvent.VK_Y ->{
+                    case KeyEvent.VK_N -> deleteSave = false;
+                    case KeyEvent.VK_Y -> {
                         GameSaveDeleter.doIt(listOfSaves.get(selectedSave));
-                        deleteSave=false;
-                        if (listOfSaves.isEmpty()){
-                            chooseSave=false;
+                        listOfSaves.remove(selectedSave);
+                        deleteSave = false;
+                        if (listOfSaves.isEmpty()) {
+                            chooseSave = false;
                         }
                     }
                 }

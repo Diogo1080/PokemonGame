@@ -38,18 +38,17 @@ public class Point {
         return true;
     }
 
-    public List<Point> neighbors8() {
+    public List<Point> neighbors4() {
         List<Point> points = new ArrayList<Point>();
 
         for (int ox = -1; ox < 2; ox++) {
             for (int oy = -1; oy < 2; oy++) {
-                if (ox == 0 && oy == 0)
-                    continue;
+                if (ox == 0 && oy != 0 || ox != 0 && oy == 0) {
+                    int nx = x + ox;
+                    int ny = y + oy;
 
-                int nx = x + ox;
-                int ny = y + oy;
-
-                points.add(new Point(nx, ny));
+                    points.add(new Point(nx, ny));
+                }
             }
         }
 

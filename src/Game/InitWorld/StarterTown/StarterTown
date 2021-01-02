@@ -10,7 +10,8 @@
             "Y": 6,
             "Events": [
                 {
-                    "name": "onTeleport",
+                    "event": "onTeleport",
+                    "name": "teleportInStartHouse",
                     "mapToTeleport": "StarterTown/Places/StartHouse",
                     "talks":[
                         "You get in your house"
@@ -19,7 +20,30 @@
                         "X": 3,
                         "Y": 7
                     },
-                    "repeat": true
+                    "repeat": true,
+                    "done": false
+                }
+            ]
+        },
+        {
+            "type": "Teleporter",
+            "name": "StartHouseEntry",
+            "X": 5,
+            "Y": 12,
+            "Events": [
+                {
+                    "event": "onTeleport",
+                    "name": "teleportInLab",
+                    "mapToTeleport": "StarterTown/Places/ProfessorsLab",
+                    "talks":[
+                        "You get in the professors lab"
+                    ],
+                    "positionToTeleport": {
+                        "X": 5,
+                        "Y": 7
+                    },
+                    "repeat": true,
+                    "done": false
                 }
             ]
         }

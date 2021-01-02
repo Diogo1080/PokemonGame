@@ -10,22 +10,26 @@ import java.util.List;
 
 public class PlayerAi extends EntitiesAi {
     private List<String> messages;
+
     public List<String> getMessages() {
         return messages;
     }
 
-    public void Notify(String message){
+    public void notify(String message) {
         messages.add(message);
     }
 
     public PlayerAi(Player entity) {
         super(entity);
-        messages=new LinkedList<>();
+        messages = new LinkedList<>();
     }
 
     @Override
     public void onEnterNewTile(int x, int y, Tile tile, Entity entityByCords) {
         if (tile.isWalkable()) {
+            super.entity.lastY = entity.y;
+            super.entity.lastX = entity.x;
+
             entity.x = x;
             entity.y = y;
         }

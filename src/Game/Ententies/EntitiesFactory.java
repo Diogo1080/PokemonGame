@@ -3,6 +3,7 @@ package Game.Ententies;
 import Game.Ententies.NPCs.Npc;
 import Game.Ententies.NPCs.NpcAi;
 import Game.Ententies.NPCs.NpcKinds.People;
+import Game.Ententies.NPCs.NpcKinds.RewardPokeball;
 import Game.Ententies.NPCs.NpcKinds.Teleporter;
 import Game.Ententies.PC.Player;
 import Game.Ententies.PC.PlayerAi;
@@ -45,4 +46,10 @@ public class EntitiesFactory {
     }
 
 
+    public Entity newRewardPokeball(String name, int x, int y) {
+        Entity rewardPokeball = new RewardPokeball(map, '0', AsciiPanel.red, x, y, name);
+        map.addAtLocation(rewardPokeball, x, y);
+        rewardPokeball.setAi(new NpcAi((RewardPokeball) rewardPokeball));
+        return rewardPokeball;
+    }
 }

@@ -1,0 +1,129 @@
+{
+  "name": "StarterTown",
+  "width": 10,
+  "height": 9,
+  "entities": [
+    {
+      "type": "People",
+      "name": "Professor",
+      "X": 6,
+      "Y": 1,
+      "Events": [
+        {
+          "event": "onInteract",
+          "name": "interaction",
+          "talks": [
+            "How's it going?"
+          ],
+          "repeat": true,
+          "done": false
+        },
+        {
+          "event": "onPlayerPosition",
+          "name": "firstEntryOnLab",
+          "positionsToLook": [
+            {
+              "X": 4,
+              "Y": 5,
+              "XFinal": 8,
+              "YFinal": 5
+            }
+          ],
+          "talks": [
+            "I've wanted to talk to you..",
+            "since you are ten years old already..",
+            "i'm going to give you your first pokemon..",
+            "on my right i have three specimen..",
+            "go ahead, the choice is yours"
+          ],
+          "parent": "doesntHavePokemon",
+          "playerHasPokemon": false,
+          "movePlayerToNpc": true,
+          "moveToPlayer": false,
+          "repeat": false,
+          "range": true,
+          "done": false
+        },
+        {
+          "event": "onPlayerPosition",
+          "name": "doesntHavePokemon",
+          "positionsToLook": [
+            {
+              "X": 4,
+              "Y": 5,
+              "XFinal": 8,
+              "YFinal": 5
+            }
+          ],
+          "talks": [
+            "Hey don't forget your Pokemon!"
+          ],
+          "playerHasPokemon": true,
+          "movePlayerToNpc": true,
+          "moveToPlayer": false,
+          "repeat": true,
+          "range": true,
+          "done": true
+        }
+      ]
+    },
+    {
+      "type": "rewardPokeball",
+      "name": "firstPokemon",
+      "X": 8,
+      "Y": 2,
+      "Events": [
+        {
+          "event": "rewardPlayer",
+          "name": "firstPokemon",
+          "talks": [
+            ""
+          ],
+          "choices": {
+            "type": "pokemon",
+            "names": [
+              "charmander",
+              "squirtle",
+              "bulbasaur"
+            ]
+          },
+          "repeat": false,
+          "done": false
+        }
+      ]
+    },
+    {
+      "type": "Teleporter",
+      "name": "LabExit",
+      "X": 5,
+      "Y": 8,
+      "Events": [
+        {
+          "event": "onTeleport",
+          "name": "teleportOutOfLab",
+          "mapToTeleport": "StarterTown/StarterTown",
+          "talks": [
+            "You get out of the professors lab"
+          ],
+          "positionToTeleport": {
+            "X": 5,
+            "Y": 13
+          },
+          "repeat": true,
+          "done": false
+        }
+      ]
+    }
+  ],
+  "mapTiles": [
+    "#--------#",
+    "|..=.....|",
+    "|--#.....|",
+    "|........|",
+    "|........|",
+    "|---.....|",
+    "|........|",
+    "|........|",
+    "#---#=#--#"
+  ]
+}

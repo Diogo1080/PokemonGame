@@ -7,6 +7,8 @@ import java.awt.*;
 
 public abstract class Entity {
     public Map map;
+    public int lastX;
+    public int lastY;
     public int x;
     public int y;
 
@@ -37,7 +39,7 @@ public abstract class Entity {
     }
 
     public boolean canEnterTile(int x, int y) {
-            return map.tile(x, y).isWalkable() && map.getEntityByCords(x, y) == null;
+            return (map.tile(x, y).isWalkable() && map.getEntityByCords(x, y) == null);
     }
 
     public Event update(){

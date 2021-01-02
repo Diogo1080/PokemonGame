@@ -2,11 +2,10 @@ package Game;
 
 import Game.Ententies.EntitiesFactory;
 import Game.Ententies.Entity;
-import Game.Ententies.Events.Event;
-import Game.Ententies.Events.onInteract;
-import Game.Ententies.Events.onTeleport;
+import Game.Ententies.Events.*;
 import Game.Ententies.NPCs.Npc;
 import Game.Ententies.NPCs.NpcKinds.People;
+import Game.Ententies.NPCs.NpcKinds.RewardPokeball;
 import Game.Ententies.NPCs.NpcKinds.Teleporter;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -60,7 +59,7 @@ public class GameLoader {
 
     private static List<Event> loadEventsFromEntity(JSONArray entityEvents, Npc npc) {
         List<Event> eventsReturned = new LinkedList<>();
-
+        Event parentEvent = null;
         for (Object event : entityEvents) {
             JSONObject eventInfo = (JSONObject) event;
 
@@ -71,29 +70,92 @@ public class GameLoader {
                 talks.add((String) talk.get(i));
             }
 
-            if ("onInteract".equals(eventInfo.get("name"))) {
-                eventsReturned.add(new onInteract((String) eventInfo.get("name"), talks, (Boolean) eventInfo.get("repeat"), npc));
+            if ("onInteract".equals(eventInfo.get("event"))) {
+                eventsReturned.add(
+                        new onInteract(
+                                (String) eventInfo.get("name"),
+                                talks,
+                                parentEvent,
+                                (Boolean) eventInfo.get("repeat"),
+                                (Boolean) eventInfo.get("done"),
+                                npc
+                        )
+                );
             }
-            if ("onTeleport".equals(eventInfo.get("name"))) {
+            if ("onTeleport".equals(eventInfo.get("event"))) {
                 JSONObject positionToTeleport = (JSONObject) eventInfo.get("positionToTeleport");
 
                 int y = Math.toIntExact((Long) positionToTeleport.get("Y"));
                 int x = Math.toIntExact((Long) positionToTeleport.get("X"));
 
-                eventsReturned.add(new onTeleport((String) eventInfo.get("name"), talks, (Boolean) eventInfo.get("repeat"), (String) eventInfo.get("mapToTeleport"), x, y, npc));
+                eventsReturned.add(
+                        new onTeleport(
+                                (String) eventInfo.get("name"),
+                                talks,
+                                parentEvent,
+                                (Boolean) eventInfo.get("repeat"),
+                                (Boolean) eventInfo.get("done"),
+                                (String) eventInfo.get("mapToTeleport"),
+                                x,
+                                y,
+                                npc
+                        )
+                );
             }
-            /*if ("onPlayerPosition".equals(eventInfo.get("name"))) {
-                List<Integer> y = new LinkedList<>(), x = new LinkedList<>();
-                JSONArray positionsToLook = (JSONArray) eventInfo.get("positionToTeleport");
-                if (!(boolean) eventInfo.get("Range")){
-                    for (int i = 0; i < positionsToLook.size(); i++) {
-                        JSONObject info = (JSONObject) positionsToLook.get(i);
-                        y.add(Math.toIntExact((Long) info.get("Y")));
-                        x.add(Math.toIntExact((Long) info.get("X")));
+            if ("onPlayerPosition".equals(eventInfo.get("event"))) {
+                List<Integer> y = new LinkedList<>(), x = new LinkedList<>(), yFinal = new LinkedList<>(), xFinal = new LinkedList<>();
+                JSONArray positionsToLook = (JSONArray) eventInfo.get("positionsToLook");
+                for (int i = 0; i < positionsToLook.size(); i++) {
+                    JSONObject info = (JSONObject) positionsToLook.get(i);
+                    y.add(Math.toIntExact((Long) info.get("Y")));
+                    x.add(Math.toIntExact((Long) info.get("X")));
+                    if ((boolean) eventInfo.get("range")) {
+                        yFinal.add(Math.toIntExact((Long) info.get("YFinal")));
+                        xFinal.add(Math.toIntExact((Long) info.get("XFinal")));
                     }
                 }
-                eventsReturned.add(new onPlayerPosition((String) eventInfo.get("name"), talks, (Boolean) eventInfo.get("repeat"),(Boolean) eventInfo.get("moveToPlayer") ,(Boolean) eventInfo.get("done"), x, y));
-            }*/
+                eventsReturned.add(
+                        new onPlayerPosition(
+                                (String) eventInfo.get("name"),
+                                talks,
+                                parentEvent,
+                                npc,
+                                (Boolean) eventInfo.get("movePlayerToNpc"),
+                                (Boolean) eventInfo.get("playerHasPokemon"),
+                                (Boolean) eventInfo.get("range"),
+                                (Boolean) eventInfo.get("repeat"),
+                                (Boolean) eventInfo.get("moveToPlayer"),
+                                (Boolean) eventInfo.get("done"),
+                                x,
+                                y,
+                                xFinal,
+                                yFinal
+                        )
+                );
+            }
+            if ("rewardPlayer".equals(eventInfo.get("event"))) {
+                List<String> choicesList = new LinkedList<>();
+                JSONObject choice = (JSONObject) eventInfo.get("choices");
+                JSONArray choices = (JSONArray) choice.get("names");
+                for (int i = 0; i < choices.size(); i++) {
+                    choicesList.add((String) choices.get(i));
+                }
+                eventsReturned.add(
+                        new rewardPlayer(
+                                (String) eventInfo.get("name"),
+                                talks,
+                                parentEvent,
+                                (Boolean) eventInfo.get("repeat"),
+                                (Boolean) eventInfo.get("done"),
+                                npc,
+                                choicesList,
+                                (String) choice.get("type")
+                        )
+                );
+            }
+            if (eventInfo.get("parent") != null) {
+                parentEvent = eventsReturned.get(eventsReturned.size() - 1);
+            }
         }
         return eventsReturned;
     }
@@ -125,6 +187,15 @@ public class GameLoader {
                     );
                     teleporter.setEvents(loadEventsFromEntity((JSONArray) entityInfo.get("Events"), teleporter));
                     map.getEntityList().add(teleporter);
+                }
+                if ("rewardPokeball".equals(entityInfo.get("type"))) {
+                    RewardPokeball rewardPokeball = (RewardPokeball) entitiesFactory.newRewardPokeball(
+                            (String) entityInfo.get("name"),
+                            Math.toIntExact((Long) entityInfo.get("X")),
+                            Math.toIntExact((Long) entityInfo.get("Y"))
+                    );
+                    rewardPokeball.setEvents(loadEventsFromEntity((JSONArray) entityInfo.get("Events"), rewardPokeball));
+                    map.getEntityList().add(rewardPokeball);
                 }
             }
         } catch (IOException | ParseException e) {
